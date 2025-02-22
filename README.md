@@ -3,7 +3,6 @@
 Dead-simple, TypeScript-first optics library. Optics are a way to drill into complex data structures and read or modify nested data.
 
 😌 **Simple concepts**. Only one optic type, `Diopter` - acts as a lens, prism, and traversal.
-Great for those less familiar with optics, but still powerful.
 
 🌊 **Fluent API**. Define optics just as you would access nested data. Get a setter for free.
 
@@ -64,7 +63,7 @@ const firstElementDiopter = <T extends any[]>() =>
     set: (list, modFn) => [modFn(list[0]), ...list.slice(1)]
   })
 
-const list = [{foo: 1}, {foo: 2}]
+const list = [{ foo: 1 }, { foo: 2 }]
 
 // compose with other diopters (or use directly)
 const firstElementFoo = d<typeof list>()
@@ -72,7 +71,7 @@ const firstElementFoo = d<typeof list>()
   .foo
 
 firstElementFoo.get(list) // 1
-firstElementFoo.set(list, 3) // [{foo: 3}, {foo: 2}]
+firstElementFoo.set(list, 3) // [{ foo: 3 }, { foo: 2 }]
 ```
 
 ## Built-in Diopters
@@ -86,58 +85,63 @@ Below, a reference of all built-in Diopters.
 This is how you start your diopter composition chain. The `d` identity function creates a no-op diopter that lets you specify the `From` type (your original data type before the optic is applied).
 
 ```ts
-const example = d<number>()
-// ^? Diopter<From: number, To: number>
+type Data = { a: { b: { c: number } } }
+const example = d<Data>()
+// ^? Diopter<From: Data, To: Data>
 
 const more = example.a.b.c
+// ^? Diopter<From: Data, To: number>
 ```
 
 ### path
 
-Allow you to access an object property by key, or a tuple/array element by index, with full type safety.
+Allows you to access an object property by key, or a tuple/array element by index, with full type safety.
 
 Objects:
 
 ```ts
-const example = d<{a: number}>().a
-// Diopter<From: {a: number}, To: number>
+type Data = { a: number }
+const example = d<Data>().a
+// Diopter<From: Data, To: number>
 
 example.get( ... )
 // ^? number
-example.get({a: 1}) // 1
+example.get({ a: 1 }) // 1
 
 example.set( ... )
-// ^? {a: number}
-example.set({a: 1}, () => 2) // {a: 2}
+// ^? Data
+example.set({ a: 1 }, () => 2) // { a: 2 }
 ```
 
 Tuples:
 
 ```ts
-const example = d<[number, string]>()[1]
-// Diopter<From: [number, string], To: string>
+type Data = [number, string]
+const example = d<Data>()[1]
+// Diopter<From: Data, To: string>
 
 example.get( ... )
 // ^? string
 example.get([1, 'a']) // 'a'
 
 example.set( ... )
-// ^? [number, string]
+// ^? Data
 example.set([1, 'a'], () => 'b') // [1, 'b']
 ```
 
 Arrays:
 
 ```ts
-const example = d<(number | string)[]>()[1]
-// Diopter<From: (number | string)[], To: number | string>
+type Data = (number | string)[]
+const example = d<Data>()[1]
+// Diopter<From: Data, To: number | string>
 
 example.get( ... )
 // ^? number | string
 example.get([1, 'a', 2]) // 'a'
 
 example.set( ... )
-// ^? (number | string)[]
+// ^? Data
 example.set([1, 'a', 2], () => 'b') // [1, 'b', 2]
 ```
 
@@ -148,7 +152,7 @@ Stops drilling (short-circuits) into the data structure immediately if the curre
 This is equivalent to the `?.` operator.
 
 ```ts
-type Data = {a: {b: number} | undefined}
+type Data = { a: { b: number } | undefined }
 const example = d<Data>()
   .a
   .opt()
@@ -188,7 +192,6 @@ The guard function can be a
 - [type guard](https://www.typescriptlang.org/docs/handbook/2/narrowing.html) – it will narrow the type of the data.
 ```ts
 type Data = number | string
-
 const example = d<Data>()
   .guard(x => typeof x === 'number') // automatic type guard
 // ^? Diopter<From: number | string, To: number, isPrism: true>
@@ -199,7 +202,7 @@ example.get(1) // 1
 example.get('a')
 
 example.set( ... )
-// ^? number | string
+// ^? Data
 example.set(1, () => 2) // 2
 // only sets if the guard passes
 example.set('a', () => 2) // 'a'
@@ -217,7 +220,7 @@ example.get(20) // 20
 example.get(1) // undefined
 
 example.set( ... )
-// ^? number
+// ^? Data
 example.set(20, x => x * 2) // 40
 // only sets if the guard passes
 example.set(1, () => 2) // 1
@@ -227,47 +230,45 @@ example.set(1, () => 2) // 1
 
 Applies a Diopter to each element of an array, and then focuses on the result.
 
-`undefined` elements are skipped from the focused array. This means that you can combine `map` with `guard` to create a `filter` Diopter.
-
 Note that when setting, this means you need to return a new modified array, typically by mapping over the given array. In other words, the setter function will only be called once with the focused array, not once per element.
 
-```ts
-type Data = {a: number | undefined}[]
+`undefined` elements are skipped from the focused array. This means that you can combine `map` with `guard` to create a `filter` Diopter.
 
+```ts
+type Data = { a: number | undefined }[]
 const foo = d<Data>()
   .map(x => x.a)
-// ^? Diopter<From: {a: number | undefined}[], To: number[]>
+// ^? Diopter<From: Data, To: number[]>
 
 foo.get( ... )
 // ^? number[]
-foo.get([{a: 1}, {a: undefined}, {a: 3}]) // [1, 3]
+foo.get([{ a: 1 }, { a: undefined }, { a: 3 }]) // [1, 3]
 
 foo.set( ... )
-// ^? {a: number | undefined}[]
+// ^? Data
 foo.set(
-  [{a: 1}, {a: undefined}, {a: 3}],
+  [{ a: 1 }, { a: undefined }, { a: 3 }],
   list => list.map(x => x * 10) // the type of `list` is `number[]`, and NOT `(number | undefined)[]`
-) // [{a: 10}, {a: undefined}, {a: 30}]
+) // [{ a: 10 }, { a: undefined }, { a: 30 }]
 ```
 
 You can nest any Diopters, including `.map()` itself withing the `.map()` callback.
 ```ts
-type Data = {a: {b: number}[]}[]
-
+type Data = { a: { b: number }[] }[]
 const example = d<Data>()
   .map(x => x.a.map(y => y.b))
-// ^? Diopter<From: {a: {b: number}[]}[], To: number[][]>
+// ^? Diopter<From: Data, To: number[][]>
 
 example.get( ... )
 // ^? number[][]
-example.get([{a: [{b: 1}, {b: 2}]}, {a: [{b: 3}, {b: 4}]}]) // [[1, 2], [3, 4]]
+example.get([{ a: [{ b: 1 }, { b: 2 }] }, { a: [{ b: 3 }, { b: 4 }] }]) // [[1, 2], [3, 4]]
 
 example.set( ... )
-// ^? {a: {b: number}[]}[]
+// ^? Data
 example.set(
-  [{a: [{b: 1}, {b: 2}]}, {a: [{b: 3}, {b: 4}]}],
+  [{ a: [{ b: 1 }, { b: 2 }] }, { a: [{ b: 3 }, { b: 4 }] }],
   list => list.map(x => x.map(y => y * 10))
-) // [{a: [{b: 10}, {b: 20}]}, {a: [{b: 30}, {b: 40}]}]
+) // [{ a: [{ b: 10 }, { b: 20 }] }, { a: [{ b: 30 }, { b: 40 }] }]
 ```
 
 You might notice that modifying this nested focused array is a bit cumbersome, since we need to map over multiple array dimensions. This is where the `flat()` method comes in.
@@ -281,15 +282,17 @@ This is very useful when focusing on nested arrays, in scenarios where you only 
 Note that arbitrary-depth flattening is not supported. This method always flattens one level deep. To flatten more levels, call `flat()` multiple times.
 
 ```ts
-const example = d<number[][]>()
+type Data = number[][]
+const example = d<Data>()
   .flat()
+// ^? Diopter<From: Data, To: number[]>
 
 example.get( ... )
 // ^? number[]
 example.get([[1, 2], [3, 4]]) // [1, 2, 3, 4]
 
 example.set( ... )
-// ^? number[][]
+// ^? Data
 example.set([[1, 2], [3, 4]], list => list.map(x => x * 10)) // [[10, 20], [30, 40]]
 ```
 
@@ -298,17 +301,18 @@ example.set([[1, 2], [3, 4]], list => list.map(x => x * 10)) // [[10, 20], [30, 
 Focuses on a subobject of an object, given by an array of keys. It's a useful way to avoid the spread syntax when setting.
 
 ```ts
-const example = d<{a: number, b: number, c: number}>().pick(['a', 'b'])
-// ^? Diopter<From: {a: number, b: number, c: number}, To: {a: number, b: number}>
+type Data = { a: number, b: number, c: number }
+const example = d<Data>().pick(['a', 'b'])
+// ^? Diopter<From: Data, To: { a: number, b: number }>
 
 example.get( ... )
-// ^? {a: number, b: number}
-example.get({a: 1, b: 2, c: 3}) // {a: 1, b: 2}
+// ^? { a: number, b: number }
+example.get({ a: 1, b: 2, c: 3 }) // { a: 1, b: 2 }
 
 example.set( ... )
-// ^? {a: number, b: number, c: number}
+// ^? Data
 // notice no spread syntax, since we're only setting the picked properties
-example.set({a: 1, b: 2}, x => ({a: x * 10, b: x * 10})) // {a: 10, b: 20}
+example.set({ a: 1, b: 2, c: 3 }, x => ({ a: x * 10, b: x * 10 })) // { a: 10, b: 20, c: 3 }
 ```
 
 ## Misc
