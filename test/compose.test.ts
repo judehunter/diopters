@@ -12,7 +12,7 @@ test('is a prism when left is a prism', () => {
 test('is a prism when right is a prism', () => {
   const data = { a: { b: 1 } } as { a: { b: 1 | undefined } }
 
-  const inner = d<{ b: 1 }>().b.opt()
+  const inner = d<{ b: 1 | undefined }>().b.opt()
   const diopter = d<typeof data>().a.compose(inner)
 
   expect(diopter.isPrism).toBe(true)
@@ -20,7 +20,7 @@ test('is a prism when right is a prism', () => {
 test('is a prism when left and right are prisms', () => {
   const data = { a: { b: 1 } } as { a: { b: 1 | undefined } | undefined }
 
-  const inner = d<{ b: 1 }>().b.opt()
+  const inner = d<{ b: 1 | undefined }>().b.opt()
   const diopter = d<typeof data>().a.opt().compose(inner)
 
   expect(diopter.isPrism).toBe(true)
