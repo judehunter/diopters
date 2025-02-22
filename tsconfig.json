@@ -13,8 +13,7 @@
     "allowSyntheticDefaultImports": true,
     "declaration": true,
     "exactOptionalPropertyTypes": true,
-    "jsx": "preserve",
-    "outDir": "./dist"
+    "jsx": "preserve"
   },
   "include": ["src", "test"]
 }

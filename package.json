@@ -4,16 +4,34 @@
   "repository": "https://github.com/judehunter/diopters",
   "author": "judehunter <jude@judehunter.dev>",
   "license": "MIT",
-  "keywords": [],
+  "description": "Dead-simple, TypeScript-first optics library.",
+  "keywords": [
+    "typescript",
+    "optics",
+    "lens",
+    "functional-programming"
+  ],
   "scripts": {
     "test": "vitest watch",
     "test:cov": "vitest --coverage",
     "test:ui": "vitest --ui --coverage.enabled=true",
-    "build": "tsc --project tsconfig.build.json"
+    "build": "microbundle --tsconfig tsconfig.build.json"
   },
   "sideEffects": false,
+  "type": "module",
+  "source": "src/index.ts",
+  "exports": {
+    "types": "./dist/index.d.ts",
+    "require": "./dist/index.cjs",
+    "default": "./dist/index.modern.js"
+  },
   "types": "./dist/index.d.ts",
-  "main": "./dist/index.js",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "unpkg": "./dist/index.umd.js",
+  "files": [
+    "dist"
+  ],
   "engines": {
     "node": "^12.0.0 || ^14.0.0 || >=16.0.0"
   },
@@ -21,16 +39,10 @@
     "@types/node": "^22.13.1",
     "@vitest/coverage-v8": "3.0.5",
     "@vitest/ui": "^3.0.5",
+    "microbundle": "^0.15.1",
     "prettier": "^3.5.0",
     "typescript": "^5.7.3",
     "vitest": "^3.0.5"
-  },
-  "prettier": {
-    "arrowParens": "always",
-    "quoteProps": "as-needed",
-    "singleQuote": true,
-    "trailingComma": "all",
-    "semi": false
   },
   "packageManager": "pnpm@9.7.1+sha512.faf344af2d6ca65c4c5c8c2224ea77a81a5e8859cbc4e06b1511ddce2f0151512431dd19e6aff31f2c6a8f5f2aced9bd2273e1fed7dd4de1868984059d2c4247"
 }
