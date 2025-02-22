@@ -1,0 +1,31 @@
+{
+  "name": "sights",
+  "version": "0.1.0",
+  "repository": "https://github.com/judehunter/sights",
+  "author": "judehunter <jude@judehunter.dev>",
+  "license": "MIT",
+  "keywords": [],
+  "scripts": {
+    "test": "vitest watch",
+    "build": "tsc --project tsconfig.build.json"
+  },
+  "sideEffects": false,
+  "types": "./dist/index.d.ts",
+  "main": "./dist/index.js",
+  "engines": {
+    "node": "^12.0.0 || ^14.0.0 || >=16.0.0"
+  },
+  "devDependencies": {
+    "prettier": "^3.5.0",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.5"
+  },
+  "prettier": {
+    "arrowParens": "always",
+    "quoteProps": "as-needed",
+    "singleQuote": true,
+    "trailingComma": "all",
+    "semi": false
+  },
+  "packageManager": "pnpm@9.7.1+sha512.faf344af2d6ca65c4c5c8c2224ea77a81a5e8859cbc4e06b1511ddce2f0151512431dd19e6aff31f2c6a8f5f2aced9bd2273e1fed7dd4de1868984059d2c4247"
+}
