@@ -328,19 +328,33 @@ describe('map', () => {
     expect(diopter.isPrism).toBe(false)
   })
 
-  test('fails on data non-array', () => {
+  test('fails on data non-array > get', () => {
     const data = 1 as any as number[]
 
     const diopter = d<typeof data>().map((x) => x)
 
     expect(() => diopter.get(data)).toThrow('Not an array')
+  })
+
+  test('fails on data non-array > set', () => {
+    const data = 1 as any as number[]
+
+    const diopter = d<typeof data>().map((x) => x)
+
     expect(() => diopter.set(data, () => [1, 2, 3])).toThrow('Not an array')
+  })
+
+  test('fails on data non-array > mod', () => {
+    const data = 1 as any as number[]
+
+    const diopter = d<typeof data>().map((x) => x)
+
     expect(() => diopter.set(data, (x) => x.map((y) => y * 2))).toThrow(
       'Not an array',
     )
   })
 
-  test('fails on modified non-array', () => {
+  test('fails on modified non-array > set & mod', () => {
     const data = [1, 2, 3] as number[]
 
     const diopter = d<typeof data>().map((x) => x)
@@ -403,7 +417,7 @@ describe('map', () => {
     expect(diopter.get(data)).toEqual([[1], [2], [3]])
   })
 
-  test('set fails on array length mismatch', () => {
+  test('fails on modified array length mismatch > set', () => {
     const data = [1, 2, 3]
 
     const diopter = d<typeof data>().map((x) => x)
@@ -412,7 +426,7 @@ describe('map', () => {
     expect(() => diopter.set(data, () => [4, 5, 6, 7])).toThrow()
   })
 
-  test('set fails on array length mismatch (with undefs)', () => {
+  test('fails on array length mismatch (with undefs) > set', () => {
     const data = [1, undefined, 3, undefined] as (number | undefined)[]
 
     const diopter = d<typeof data>().map((x) => x)
@@ -511,7 +525,43 @@ describe('map', () => {
     ])
   })
 
-  test.skip('undefined elements > nested')
+  test('undefined elements > nested > get', () => {
+    const data = [[1, 2], [3, undefined], undefined]
+
+    const diopter = d<typeof data>()
+      .map((x) => x)
+      .map((x) => x.map((y) => y))
+
+    expect(diopter.get(data)).toEqual([[1, 2], [3]])
+  })
+
+  test('undefined elements > nested > set', () => {
+    const data = [[1, 2], [3, undefined], undefined]
+
+    const diopter = d<typeof data>()
+      .map((x) => x)
+      .map((x) => x.map((y) => y))
+
+    expect(diopter.set(data, () => [[4, 5], [6]])).toEqual([
+      [4, 5],
+      [6, undefined],
+      undefined,
+    ])
+  })
+
+  test('undefined elements > nested > set', () => {
+    const data = [[1, 2], [3, undefined], undefined]
+
+    const diopter = d<typeof data>()
+      .map((x) => x)
+      .map((x) => x.map((y) => y))
+
+    expect(diopter.set(data, (x) => [[x[0][0] * 10, 5], [6]])).toEqual([
+      [10, 5],
+      [6, undefined],
+      undefined,
+    ])
+  })
 
   test('with guard > get', () => {
     const data = [1, 2, 3, 4]
@@ -727,31 +777,59 @@ describe('flatOnce', () => {
     ])
   })
 
-  test('fails on data non-array', () => {
+  test('fails on data non-array > get', () => {
     const data = 1 as any
 
     const diopter = d<typeof data>().flatOnce()
 
     expect(() => diopter.get(data)).toThrow('Not an array')
+  })
+
+  test('fails on data non-array > set', () => {
+    const data = 1 as any
+
+    const diopter = d<typeof data>().flatOnce()
+
     expect(() => diopter.set(data, () => [1, 2])).toThrow('Not an array')
+  })
+
+  test('fails on data non-array > mod', () => {
+    const data = 1 as any
+
+    const diopter = d<typeof data>().flatOnce()
+
     expect(() => diopter.set(data, (x) => x.map((y) => y * 10))).toThrow(
       'Not an array',
     )
   })
 
-  test('fails on data non-2d array', () => {
+  test('fails on data non-2d array > get', () => {
     const data = [1, 2, 3] as any
 
     const diopter = d<typeof data>().flatOnce()
 
     expect(() => diopter.get(data)).toThrow('Not a 2d array')
+  })
+
+  test('fails on data non-2d array > set', () => {
+    const data = [1, 2, 3] as any
+
+    const diopter = d<typeof data>().flatOnce()
+
     expect(() => diopter.set(data, () => [1, 2])).toThrow('Not a 2d array')
+  })
+
+  test('fails on data non-2d array > mod', () => {
+    const data = [1, 2, 3] as any
+
+    const diopter = d<typeof data>().flatOnce()
+
     expect(() => diopter.set(data, (x) => x.map((y) => y * 10))).toThrow(
       'Not a 2d array',
     )
   })
 
-  test('fails on array length mismatch', () => {
+  test('fails on array length mismatch > set', () => {
     const data = [
       [1, 2],
       [3, 4, 5],
@@ -762,6 +840,19 @@ describe('flatOnce', () => {
     expect(() => diopter.set(data, () => [1, 2])).toThrow(
       'Modified array length mismatch',
     )
+  })
+
+  test('fails on array length mismatch > mod', () => {
+    const data = [
+      [1, 2],
+      [3, 4, 5],
+    ]
+
+    const diopter = d<typeof data>().flatOnce()
+
+    expect(() =>
+      diopter.set(data, (x) => x.map((y) => y * 10).slice(0, 2)),
+    ).toThrow('Modified array length mismatch')
   })
 })
 
@@ -798,19 +889,33 @@ describe('pick', () => {
     })
   })
 
-  test('fails on data non-object', () => {
+  test('fails on data non-object > get', () => {
     const data = null as any
 
     const diopter = d<typeof data>().pick(['a', 'b'])
 
     expect(() => diopter.get(data)).toThrow('Not an object')
+  })
+
+  test('fails on data non-object > set', () => {
+    const data = null as any
+
+    const diopter = d<typeof data>().pick(['a', 'b'])
+
     expect(() => diopter.set(data, () => ({ a: 4, b: 5 }))).toThrow(
       'Not an object',
     )
+  })
+
+  test('fails on data non-object > mod', () => {
+    const data = null as any
+
+    const diopter = d<typeof data>().pick(['a', 'b'])
+
     expect(() => diopter.set(data, (x) => x)).toThrow('Not an object')
   })
 
-  test('fails on modified non-object', () => {
+  test('fails on modified non-object > set', () => {
     const data = { a: 1, b: 2 }
 
     const diopter = d<typeof data>().pick(['a', 'b'])
@@ -818,12 +923,9 @@ describe('pick', () => {
     expect(() => diopter.set(data, () => 1 as any)).toThrow(
       'Modified value is not an object',
     )
-    expect(() => diopter.set(data, (x) => 1 as any)).toThrow(
-      'Modified value is not an object',
-    )
   })
 
-  test('fails on additional modified keys', () => {
+  test('fails on additional modified keys > set', () => {
     const data = { a: 1, b: 2 }
 
     const diopter = d<typeof data>().pick(['a', 'b'])
@@ -833,7 +935,7 @@ describe('pick', () => {
     )
   })
 
-  test('fails on missing modified keys', () => {
+  test('fails on missing modified keys > set', () => {
     const data = { a: 1, b: 2 }
 
     const diopter = d<typeof data>().pick(['a', 'b'])

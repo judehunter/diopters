@@ -52,8 +52,9 @@ export type Std<A, B, isAbPrism extends boolean> = {
 
   /**
    * `filter()` returns a sub-array of elements that match the predicate.
+   * Equivalent of running `map()` with a `guard()` inside.
    */
-  filter<C extends B>(predicate: (b: B) => b is C): Diopter<A[], C[]>
+  // filter<C extends B>(predicate: (b: B) => b is C): Diopter<A[], C[]>
 
   /**
    * `pick()` focuses on a subset of keys from the object.
