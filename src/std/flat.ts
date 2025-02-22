@@ -1,6 +1,6 @@
 import { diopter } from '../diopter'
 
-export const makeFlatOnce = () => {
+export const makeFlat = () => {
   return diopter({
     get: (a) => {
       if (!Array.isArray(a)) {
@@ -39,6 +39,6 @@ export const makeFlatOnce = () => {
       })
       return new2d
     }) as any,
-    debug: 'flatOnce',
+    debug: 'flat',
   })
 }

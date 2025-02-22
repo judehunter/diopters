@@ -1,4 +1,4 @@
-import { ValueOf } from '../utils'
+import { ArrayElem, ObjElem, ValueOf } from '../utils'
 import { NonUndef } from '../utils'
 import { diopter, Diopter } from '../diopter'
 import { composeDiopters } from '../composeDiopters'
@@ -6,7 +6,7 @@ import { d } from '../d'
 import { paths } from './paths'
 import { makeGuard } from './guard'
 import { makeMap } from './map'
-import { makeFlatOnce } from './flatOnce'
+import { makeFlat } from './flat'
 import { makeOpt } from './opt'
 import { makePick } from './pick'
 
@@ -42,13 +42,18 @@ export type Std<A, B, isAbPrism extends boolean> = {
   ): Diopter<A, X, true>
 
   /**
+   * `values()` focuses on the values of an object.
+   */
+  values(): Diopter<A, ObjElem<B>, true>
+
+  /**
    * `map()` applies a diopter given by `mapFn` to each element of the array.
    */
   map<C>(
     mapFn: (
-      valueOfA: Diopter<ValueOf<B>, ValueOf<B>>,
-    ) => Diopter<ValueOf<B>, C, true> | Diopter<ValueOf<B>, C, false>,
-  ): Diopter<A, NonNullable<C>[]>
+      valueOfA: Diopter<ArrayElem<B>, ArrayElem<B>>,
+    ) => Diopter<ArrayElem<B>, C, true> | Diopter<ArrayElem<B>, C, false>,
+  ): B extends any[] ? Diopter<A, C[]> : never
 
   /**
    * `filter()` returns a sub-array of elements that match the predicate.
@@ -64,10 +69,10 @@ export type Std<A, B, isAbPrism extends boolean> = {
   ): Diopter<A, Pick<B, PickedKeys>>
 
   /**
-   * `flatOnce()` turns a 2d array into a 1d array.
+   * `flat()` turns a 2d array into a 1d array.
    * Apply multiple times to flatten more levels.
    */
-  flatOnce(): Diopter<A, B extends any[][] ? B[number] : never>
+  flat(): B extends any[][] ? Diopter<A, B[number]> : never
 }
 
 export const std = <A, B, isAbPrism extends boolean>(
@@ -88,8 +93,8 @@ export const std = <A, B, isAbPrism extends boolean>(
   const pick: Std<A, B, isAbPrism>['pick'] = (keys) =>
     compose(makePick(keys as any) as any) as any
 
-  const flatOnce: Std<A, B, isAbPrism>['flatOnce'] = () =>
-    compose(makeFlatOnce() as any) as any
+  const flat: Std<A, B, isAbPrism>['flat'] = () =>
+    compose(makeFlat() as any) as any
 
   const target = {
     ...ab,
@@ -98,7 +103,7 @@ export const std = <A, B, isAbPrism extends boolean>(
     guard,
     map,
     pick,
-    flatOnce,
+    flat,
   }
 
   return paths(target, compose)
