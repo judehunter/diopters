@@ -1,17 +1,3 @@
-import { test, expect, vi, describe } from 'vitest'
-import { d, diopter } from '../src'
-
-
-
-
-
-
-
-
-
-
-
-
-test.skip('map over object values')
+import { test } from 'vitest'
 
 test.skip('nested path fails on undefined without opt')

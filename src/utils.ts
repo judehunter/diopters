@@ -26,3 +26,9 @@ export type ObjElem<T> = T extends Record<any, any> ? T[keyof T] : never
 export type RemoveNevers<T extends Record<string, any>> = {
   [K in keyof T as T[K] extends never ? never : K]: T[K]
 }
+
+export type ObjEntry<T> = [KeysDistr<T>, ValueOf<T>]
+
+export type Simplify<T> = {
+  [K in keyof T]: T[K]
+} & {}

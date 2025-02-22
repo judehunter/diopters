@@ -1,4 +1,4 @@
-import { ArrayElem, ObjElem, RemoveNevers, ValueOf } from '../utils'
+import { ArrayElem, ObjElem, ObjEntry, RemoveNevers, ValueOf } from '../utils'
 import { NonUndef } from '../utils'
 import { diopter, Diopter } from '../diopter'
 import { composeDiopters } from '../composeDiopters'
@@ -10,6 +10,7 @@ import { makeFlat } from './flat'
 import { makeOpt } from './opt'
 import { makePick } from './pick'
 import { makeValues } from './values'
+import { makeEntries } from './entries'
 
 export type Std<A, B, isAbPrism extends boolean> = RemoveNevers<{
   /**
@@ -47,6 +48,13 @@ export type Std<A, B, isAbPrism extends boolean> = RemoveNevers<{
    */
   values: [B] extends [Record<string, any>]
     ? () => Diopter<A, ObjElem<B>[], true>
+    : never
+
+  /**
+   * `entries()` focuses on the entries of an object.
+   */
+  entries: [B] extends [Record<string, any>]
+    ? () => Diopter<A, ObjEntry<B>[], true>
     : never
 
   /**
@@ -93,6 +101,9 @@ export const std = <A, B, isAbPrism extends boolean>(
   const values: Std<A, B, isAbPrism>['values'] = (() =>
     compose(makeValues() as any) as any) as any
 
+  const entries: Std<A, B, isAbPrism>['entries'] = (() =>
+    compose(makeEntries() as any) as any) as any
+
   const map: Std<A, B, isAbPrism>['map'] = (mapFn) =>
     compose(makeMap(mapFn) as any) as any
 
@@ -108,6 +119,7 @@ export const std = <A, B, isAbPrism extends boolean>(
     opt,
     guard,
     values,
+    entries,
     map,
     pick,
     flat,

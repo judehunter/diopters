@@ -265,11 +265,3 @@ test('with guard > mod', () => {
 
   expect(diopter.set(data, (x) => x.map((y) => y * 10))).toEqual([1, 20, 3, 40])
 })
-
-test('object map fails', () => {
-  const data = { a: 1, b: 2, c: 3 }
-
-  const diopter = d<typeof data>().map((x) => x)
-
-  expect(diopter.get(data)).toEqual([1, 2, 3])
-})

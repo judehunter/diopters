@@ -24,6 +24,6 @@ export const makeValues = () => {
 
       return Object.fromEntries(stitchedWithKeys)
     },
-    debug: 'elems',
+    debug: 'values',
   })
 }

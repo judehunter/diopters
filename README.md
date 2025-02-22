@@ -13,7 +13,7 @@ Great for those less familiar with optics, but still powerful.
 
 🔋 **Batteries included**. Ships with common optics, like `path`, `map`, `guard`, and more.
 
-🔧 **Well tested**. 111 comprehensive tests, 100% coverage. Any issues are swiftly addressed.
+🔧 **Well tested**. 124 comprehensive tests, 100% coverage. Any issues are swiftly addressed.
 
 ```ts
 type User = { accounts?: Account[] }
@@ -21,7 +21,7 @@ type Account = { money: number}
 
 const userToMoney = d<User>()
   .accounts // access path
-  .opt() // short-circuit if undefined
+  .opt() // short-circuit if undefined (like `?.`)
   .map(account => account.money) // apply callback optic to each array element
 
 typeof userToMoney

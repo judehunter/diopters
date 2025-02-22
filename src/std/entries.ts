@@ -16,6 +16,6 @@ export const makeEntries = () => {
 
       return Object.fromEntries(modFn(Object.entries(on)))
     },
-    debug: 'elems',
+    debug: 'entries',
   })
 }

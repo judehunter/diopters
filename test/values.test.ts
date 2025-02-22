@@ -39,7 +39,33 @@ test('basic > mod', () => {
   })
 })
 
+test('advanced use case > get', () => {
+  const data = { a: { b: 1 }, c: { d: 2 }, e: undefined }
+
+  const diopter = d<typeof data>()
+    .values()
+    .map((x) => x.opt().values())
+    .flat()
+
+  expect(diopter.get(data)).toEqual([1, 2])
+})
+
 test('advanced use case > set', () => {
+  const data = { a: { b: 1 }, c: { d: 2 }, e: undefined }
+
+  const diopter = d<typeof data>()
+    .values()
+    .map((x) => x.opt().values())
+    .flat()
+
+  expect(diopter.set(data, () => [10, 20])).toEqual({
+    a: { b: 10 },
+    c: { d: 20 },
+    e: undefined,
+  })
+})
+
+test('advanced use case > mod', () => {
   const data = { a: { b: 1 }, c: { d: 2 }, e: undefined }
 
   const diopter = d<typeof data>()
