@@ -19,7 +19,7 @@ export type Std<A, B, isAbPrism extends boolean> = {
    * including your custom diopters.
    */
   compose<C, isBcPrism extends boolean>(
-    bc: Diopter<B, C, isBcPrism>,
+    bc: Diopter<NoInfer<B>, C, isBcPrism>,
   ): Diopter<
     A,
     C,

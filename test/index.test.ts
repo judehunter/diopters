@@ -227,6 +227,41 @@ describe('path', () => {
       a: { b: { c: { d: 2 } } },
     })
   })
+
+  test('array index > get', () => {
+    const data = [[1], [2], [3]] as number[][]
+
+    const diopter = d<typeof data>()[1][0]
+
+    expect(diopter.get(data)).toBe(2)
+  })
+
+  test('array index > set', () => {
+    const data = [[1], [2], [3]] as number[][]
+
+    const diopter = d<typeof data>()[1][0]
+
+    expect(diopter.set(data, () => 4)).toEqual([[1], [4], [3]])
+  })
+
+  test('array index > mod', () => {
+    const data = [[1], [2], [3]] as number[][]
+
+    const diopter = d<typeof data>()[1][0]
+
+    expect(diopter.set(data, (x) => x * 10)).toEqual([[1], [20], [3]])
+  })
+
+  test('fails on symbol > set', () => {
+    const symbol = Symbol('foo')
+    const data = { [symbol]: 1 }
+
+    const diopter = d<typeof data>()[symbol]
+
+    expect(() => diopter.set(data, () => 2)).toThrow(
+      'Symbols are not supported',
+    )
+  })
 })
 
 describe('guard', () => {
@@ -591,6 +626,18 @@ describe('map', () => {
 })
 
 describe('flatOnce', () => {
+  test('not a prism', () => {
+    const data = [
+      [1, 2],
+      [3, 4],
+      [5, 6],
+    ]
+
+    const diopter = d<typeof data>().flatOnce()
+
+    expect(diopter.isPrism).toBe(false)
+  })
+
   test('2d matrix > get', () => {
     const data = [
       [1, 2],
@@ -857,6 +904,14 @@ describe('flatOnce', () => {
 })
 
 describe('pick', () => {
+  test('not a prism', () => {
+    const data = { a: 1, b: 2, c: 3 }
+
+    const diopter = d<typeof data>().pick(['a', 'b'])
+
+    expect(diopter.isPrism).toBe(false)
+  })
+
   test('get', () => {
     const data = { a: 1, b: 2, c: 3 }
 
@@ -943,5 +998,24 @@ describe('pick', () => {
     expect(() => diopter.set(data, () => ({ a: 4 }) as any)).toThrow(
       'Modified value does not specify all keys',
     )
+  })
+
+  test.skip('undefined values')
+  test.skip('non-existing keys')
+})
+
+describe('compose', () => {
+  test('is a prism when left is a prism')
+  test('is a prism when right is a prism')
+  test('is a prism when left and right are prisms')
+  test('is not a prism when left and right are not prisms')
+
+  test('with another build-in diopter', () => {
+    const data = { a: { b: 1 } }
+
+    const inner = d<(typeof data)['a']>().b
+    const diopter = d<typeof data>().a.compose(inner)
+
+    expect(diopter.get(data)).toBe(1)
   })
 })

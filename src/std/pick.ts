@@ -36,5 +36,5 @@ export const makePick = (keys: string[]) =>
         return acc
       }, a as any)
     },
-    isPrism: true,
+    isPrism: false,
   })
