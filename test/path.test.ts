@@ -157,3 +157,33 @@ test('fails on symbol > set', () => {
 
   expect(() => diopter.set(data, () => 2)).toThrow('Symbols are not supported')
 })
+
+test('fails on undefined without opt > get', () => {
+  const data = { a: undefined as any as { b: number } }
+
+  const diopter = d<typeof data>().a.b
+
+  expect(() => diopter.get(data)).toThrow(
+    "Cannot read properties of undefined (reading 'b')",
+  )
+})
+
+test('fails on undefined without opt > set', () => {
+  const data = { a: undefined as any as { b: number } }
+
+  const diopter = d<typeof data>().a.b
+
+  expect(() => diopter.set(data, () => 2)).toThrow(
+    "Cannot read properties of undefined (reading 'b')",
+  )
+})
+
+test('fails on undefined without opt > mod', () => {
+  const data = { a: undefined as any as { b: number } }
+
+  const diopter = d<typeof data>().a.b
+
+  expect(() => diopter.set(data, (x) => x + 1)).toThrow(
+    "Cannot read properties of undefined (reading 'b')",
+  )
+})
