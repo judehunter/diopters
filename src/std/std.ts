@@ -29,9 +29,13 @@ export type Std<A, B, isAbPrism extends boolean> = RemoveNevers<{
   >
 
   /**
-   * `opt()` is just a `guard()` with a predicate that excludes `undefined`
+   * `opt()` is just a `guard()` with a predicate that excludes `undefined` and `null`
    */
-  opt: [undefined] extends [B] ? () => Diopter<A, NonUndef<B>, true> : never
+  opt: [undefined] extends [B]
+    ? () => Diopter<A, NonNullable<B>, true>
+    : [null] extends [B]
+      ? () => Diopter<A, NonNullable<B>, true>
+      : never
 
   /**
    * `guard()` takes a predicate and returns a new composed diopter that

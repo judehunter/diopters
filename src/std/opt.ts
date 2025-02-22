@@ -1,3 +1,3 @@
 import { makeGuard } from './guard'
 
-export const makeOpt = () => makeGuard((a) => a !== undefined)
+export const makeOpt = () => makeGuard((a) => a != null)
