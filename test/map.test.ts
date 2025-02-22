@@ -56,7 +56,7 @@ test('identity map function', () => {
   expect(diopter.get(data)).toEqual(data)
 })
 
-test('get', () => {
+test('basic > get', () => {
   const data = [{ a: 1 }, { a: 2 }, { a: 3 }] as { a: number }[]
 
   const diopter = d<typeof data>().map((x) => x.a)
@@ -64,7 +64,7 @@ test('get', () => {
   expect(diopter.get(data)).toEqual([1, 2, 3])
 })
 
-test('set', () => {
+test('basic > set', () => {
   const data = [{ a: 1 }, { a: 2 }, { a: 3 }] as { a: number }[]
 
   const diopter = d<typeof data>().map((x) => x.a)
@@ -76,7 +76,7 @@ test('set', () => {
   ])
 })
 
-test('mod', () => {
+test('basic > mod', () => {
   const data = [{ a: 1 }, { a: 2 }, { a: 3 }] as { a: number }[]
 
   const diopter = d<typeof data>().map((x) => x.a)
@@ -266,7 +266,7 @@ test('with guard > mod', () => {
   expect(diopter.set(data, (x) => x.map((y) => y * 10))).toEqual([1, 20, 3, 40])
 })
 
-test('over object values', () => {
+test('object map fails', () => {
   const data = { a: 1, b: 2, c: 3 }
 
   const diopter = d<typeof data>().map((x) => x)

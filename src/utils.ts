@@ -22,3 +22,7 @@ export type ValueOf<T> = T extends any[]
 export type ArrayElem<T> = T extends any[] ? T[number] : never
 
 export type ObjElem<T> = T extends Record<any, any> ? T[keyof T] : never
+
+export type RemoveNevers<T extends Record<string, any>> = {
+  [K in keyof T as T[K] extends never ? never : K]: T[K]
+}

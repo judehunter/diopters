@@ -1,4 +1,4 @@
-import { ArrayElem, ObjElem, ValueOf } from '../utils'
+import { ArrayElem, ObjElem, RemoveNevers, ValueOf } from '../utils'
 import { NonUndef } from '../utils'
 import { diopter, Diopter } from '../diopter'
 import { composeDiopters } from '../composeDiopters'
@@ -9,8 +9,9 @@ import { makeMap } from './map'
 import { makeFlat } from './flat'
 import { makeOpt } from './opt'
 import { makePick } from './pick'
+import { makeValues } from './values'
 
-export type Std<A, B, isAbPrism extends boolean> = {
+export type Std<A, B, isAbPrism extends boolean> = RemoveNevers<{
   /**
    * `compose()` takes a diopter and returns a new diopter that
    * is the composition of the two diopters.
@@ -44,7 +45,9 @@ export type Std<A, B, isAbPrism extends boolean> = {
   /**
    * `values()` focuses on the values of an object.
    */
-  values(): Diopter<A, ObjElem<B>, true>
+  values: [B] extends [Record<string, any>]
+    ? () => Diopter<A, ObjElem<B>[], true>
+    : never
 
   /**
    * `map()` applies a diopter given by `mapFn` to each element of the array.
@@ -53,7 +56,7 @@ export type Std<A, B, isAbPrism extends boolean> = {
     mapFn: (
       valueOfA: Diopter<ArrayElem<B>, ArrayElem<B>>,
     ) => Diopter<ArrayElem<B>, C, true> | Diopter<ArrayElem<B>, C, false>,
-  ): B extends any[] ? Diopter<A, C[]> : never
+  ): B extends any[] ? Diopter<A, NonNullable<C>[]> : never
 
   /**
    * `filter()` returns a sub-array of elements that match the predicate.
@@ -73,7 +76,7 @@ export type Std<A, B, isAbPrism extends boolean> = {
    * Apply multiple times to flatten more levels.
    */
   flat(): B extends any[][] ? Diopter<A, B[number]> : never
-}
+}>
 
 export const std = <A, B, isAbPrism extends boolean>(
   ab: Diopter<A, B, isAbPrism>,
@@ -86,6 +89,9 @@ export const std = <A, B, isAbPrism extends boolean>(
 
   const guard: Std<A, B, isAbPrism>['guard'] = (predicate) =>
     compose(makeGuard(predicate) as any) as any
+
+  const values: Std<A, B, isAbPrism>['values'] = (() =>
+    compose(makeValues() as any) as any) as any
 
   const map: Std<A, B, isAbPrism>['map'] = (mapFn) =>
     compose(makeMap(mapFn) as any) as any
@@ -101,6 +107,7 @@ export const std = <A, B, isAbPrism extends boolean>(
     compose,
     opt,
     guard,
+    values,
     map,
     pick,
     flat,

@@ -13,7 +13,7 @@ Great for those less familiar with optics, but still powerful.
 
 🔋 **Batteries included**. Ships with common optics, like `path`, `map`, `guard`, and more.
 
-🔧 **Well tested**. 111 comprehensive tests, 100% coverage.
+🔧 **Well tested**. 111 comprehensive tests, 100% coverage. Any issues are swiftly addressed.
 
 ```ts
 type User = { accounts?: Account[] }
