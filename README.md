@@ -6,13 +6,13 @@ Dead-simple, TypeScript-first optics library. Optics are a way to drill into com
 
 🌊 **Fluent API**. Define optics just as you would access nested data. Get a setter for free.
 
-🤏 **Tiny**. 1kB minified and brotlied. No dependencies.
+🤏 **Tiny**. <1kB minified and brotlied. No dependencies.
 
 🧠 **TypeScript-first**. Fully type safe optic composition.
 
 🔋 **Batteries included**. Ships with common optics, like `path`, `map`, `guard`, and more.
 
-🔧 **Well tested**. 131 comprehensive tests, 100% coverage. Any issues will be swiftly addressed.
+🔧 **Well tested**. 137 comprehensive tests, 100% coverage. Any issues will be swiftly addressed.
 
 ```ts
 type User = { accounts?: Account[] }
