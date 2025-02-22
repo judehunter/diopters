@@ -34,7 +34,7 @@
     "resolvePackageJsonImports": true,
     "emitDeclarationOnly": false,
     "incremental": true,
-    "tsBuildInfoFile": "D:/dev/oss/sights/node_modules/.pnpm/vitest@3.0.5_@types+node@22.13.1/node_modules/vitest/dist/chunks/tsconfig.tmp.tsbuildinfo"
+    "tsBuildInfoFile": "D:/dev/oss/sights/node_modules/.pnpm/vitest@3.0.5_@types+node@22.13.1_@vitest+ui@3.0.5/node_modules/vitest/dist/chunks/tsconfig.tmp.tsbuildinfo"
   },
   "include": [
     "src",

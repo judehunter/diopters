@@ -538,4 +538,98 @@ describe('flatOnce', () => {
       [11, 12],
     ])
   })
+
+  test('2d matrix > mod', () => {
+    const data = [
+      [1, 2],
+      [3, 4],
+      [5, 6],
+    ]
+
+    const diopter = d<typeof data>().flatOnce()
+
+    expect(diopter.set(data, (x) => x.map((y) => y * 10))).toEqual([
+      [10, 20],
+      [30, 40],
+      [50, 60],
+    ])
+  })
+
+  test('2d array with uneven lengths > get', () => {
+    const data = [[1], [2, 3, 4], [5, 6]]
+
+    const diopter = d<typeof data>().flatOnce()
+
+    expect(diopter.get(data)).toEqual([1, 2, 3, 4, 5, 6])
+  })
+
+  test('2d array with uneven lengths > set', () => {
+    const data = [[1], [2, 3, 4], [5, 6]]
+
+    const diopter = d<typeof data>().flatOnce()
+
+    expect(diopter.set(data, () => [7, 8, 9, 10, 11, 12])).toEqual([
+      [7],
+      [8, 9, 10],
+      [11, 12],
+    ])
+  })
+
+  test('2d array with uneven lengths > mod', () => {
+    const data = [[1], [2, 3, 4], [5, 6]]
+
+    const diopter = d<typeof data>().flatOnce()
+
+    expect(diopter.set(data, (x) => x.map((y) => y * 10))).toEqual([
+      [10],
+      [20, 30, 40],
+      [50, 60],
+    ])
+  })
+
+  test('3d array > get', () => {
+    const data = [
+      [[1]],
+      [
+        [2, 3, 4],
+        [5, 6],
+      ],
+    ]
+
+    const diopter = d<typeof data>().flatOnce().flatOnce()
+
+    expect(diopter.get(data)).toEqual([1, 2, 3, 4, 5, 6])
+  })
+
+  test('3d array > set', () => {
+    const data = [
+      [[1]],
+      [
+        [2, 3, 4],
+        [5, 6],
+      ],
+    ]
+
+    const diopter = d<typeof data>().flatOnce().flatOnce()
+
+    console.log(diopter.print())
+
+    expect(diopter.set(data, () => [7, 8, 9, 10, 11, 12])).toEqual([
+      [[7]],
+      [
+        [8, 9, 10],
+        [11, 12],
+      ],
+    ])
+  })
+
+  test('3d array > mod', () => {
+    const data = [
+      [[1]],
+      [
+        [2, 3, 4],
+        [5, 6],
+      ],
+    ]
+  })
 })
