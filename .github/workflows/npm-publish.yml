@@ -1,20 +1,24 @@
 on:
   push:
     tags:
-    - 'v*.*.*'
+      - 'v*.*.*'
 
 jobs:
   publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
+
       - uses: actions/setup-node@v1
         with:
-          node-version: 14.15.0
-      - run: npm i -g yarn
-      - run: yarn
-      - run: yarn test
-      - run: yarn build
+          node-version: 22.3.0
+
+      - uses: pnpm/action-setup@v4
+
+      - run: pnpm i
+
+      - run: pnpm build
+
       - uses: JS-DevTools/npm-publish@v1
         with:
           token: ${{ secrets.NPM_TOKEN }}
