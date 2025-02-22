@@ -22,19 +22,16 @@ export const makeMap = (mapFn: (a: any) => any) => {
       if (!Array.isArray(a)) {
         throw new Error('Not an array')
       }
-      const valuesWithUndefs = a.map((elem, i) => {
-        const elemLens = d<typeof elem>()
-        const transformedLens = mapFn(elemLens as any)
-        const transformed = transformedLens.get(elem)
-        return transformed
-      })
+      const elemLens = d()
+      const mapLens = mapFn(elemLens as any)
+      const valuesWithUndefs = a.map((elem, i) => mapLens.get(elem))
 
       const definedIndices = valuesWithUndefs
         .map((x, i) => (x !== undefined ? i : null))
         .filter((x) => x !== null)
 
       const values = valuesWithUndefs.filter(
-        (x): x is NonNullable<typeof x> => x !== undefined && x !== null,
+        (x): x is NonNullable<typeof x> => x !== undefined,
       )
 
       const modified = modFn(values)
@@ -46,14 +43,12 @@ export const makeMap = (mapFn: (a: any) => any) => {
         throw new Error('Array length mismatch')
       }
 
-      return a
-        .filter((_, i) => definedIndices.includes(i))
-        .map((elem, i) => {
-          const elemLens = d<typeof elem>()
-          const transformedLens = mapFn(elemLens as any)
-          const transformed = transformedLens.set(elem, () => modified[i])
-          return transformed
-        })
+      return a.map((elem, i) => {
+        if (!definedIndices.includes(i)) {
+          return elem
+        }
+        return mapLens.set(elem, () => modified[definedIndices.indexOf(i)])
+      })
     }) as any,
     debug: `map(${mapFn.toString()})`,
   })

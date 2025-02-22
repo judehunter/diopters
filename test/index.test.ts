@@ -496,7 +496,7 @@ describe('map', () => {
 
     const diopter = d<typeof data>().map((x) => x)
 
-    expect(diopter.set(data, () => [4, 6])).toEqual([4, 6])
+    expect(diopter.set(data, () => [4, 6])).toEqual([4, undefined, 6])
   })
 
   test('undefined elements > mod', () => {
@@ -504,10 +504,40 @@ describe('map', () => {
 
     const diopter = d<typeof data>().map((x) => x)
 
-    expect(diopter.set(data, (x) => x.map((y) => y * 10))).toEqual([10, 30])
+    expect(diopter.set(data, (x) => x.map((y) => y * 10))).toEqual([
+      10,
+      undefined,
+      30,
+    ])
   })
 
   test.skip('undefined elements > nested')
+
+  test('with guard > get', () => {
+    const data = [1, 2, 3, 4]
+
+    const diopter = d<typeof data>().map((x) => x.guard((y) => y % 2 === 0))
+
+    expect(diopter.get(data)).toEqual([2, 4])
+  })
+
+  test('with guard > set', () => {
+    const data = [1, 2, 3, 4]
+
+    const diopter = d<typeof data>().map((x) => x.guard((y) => y % 2 === 0))
+
+    expect(diopter.set(data, () => [4, 5])).toEqual([1, 4, 3, 5])
+  })
+
+  test('with guard > mod', () => {
+    const data = [1, 2, 3, 4]
+
+    const diopter = d<typeof data>().map((x) => x.guard((y) => y % 2 === 0))
+
+    expect(diopter.set(data, (x) => x.map((y) => y * 10))).toEqual([
+      1, 20, 3, 40,
+    ])
+  })
 })
 
 describe('flatOnce', () => {
@@ -612,8 +642,6 @@ describe('flatOnce', () => {
 
     const diopter = d<typeof data>().flatOnce().flatOnce()
 
-    console.log(diopter.print())
-
     expect(diopter.set(data, () => [7, 8, 9, 10, 11, 12])).toEqual([
       [[7]],
       [
@@ -631,5 +659,108 @@ describe('flatOnce', () => {
         [5, 6],
       ],
     ]
+
+    const diopter = d<typeof data>().flatOnce().flatOnce()
+
+    expect(diopter.set(data, (list) => list.map((x) => x * 10))).toEqual([
+      [[10]],
+      [
+        [20, 30, 40],
+        [50, 60],
+      ],
+    ])
+  })
+
+  test('complex > get', () => {
+    const data = [
+      { a: [{ b: 1 }, { b: 2 }] },
+      { a: [{ c: 3 }, { b: 4 }] },
+      { a: [{ b: 5 }, { c: 6 }] },
+    ]
+
+    const diopter = d<typeof data>()
+      .map((x) =>
+        x.a.map((y) => y.guard((z): z is { b: number } => 'b' in z).b),
+      )
+      .flatOnce()
+
+    expect(diopter.get(data)).toEqual([1, 2, 4, 5])
+  })
+
+  test('complex > set', () => {
+    const data = [
+      { a: [{ b: 1 }, { b: 2 }] },
+      { a: [{ c: 3 }, { b: 4 }] },
+      { a: [{ b: 5 }, { c: 6 }] },
+    ]
+
+    const diopter = d<typeof data>()
+      .map((x) =>
+        x.a.map((y) => y.guard((z): z is { b: number } => 'b' in z).b),
+      )
+      .flatOnce()
+
+    expect(diopter.set(data, () => [7, 8, 9, 10])).toEqual([
+      { a: [{ b: 7 }, { b: 8 }] },
+      { a: [{ c: 3 }, { b: 9 }] },
+      { a: [{ b: 10 }, { c: 6 }] },
+    ])
+  })
+
+  test('complex > mod', () => {
+    const data = [
+      { a: [{ b: 1 }, { b: 2 }] },
+      { a: [{ c: 3 }, { b: 4 }] },
+      { a: [{ b: 5 }, { c: 6 }] },
+    ]
+
+    const diopter = d<typeof data>()
+      .map((x) =>
+        x.a.map((y) => y.guard((z): z is { b: number } => 'b' in z).b),
+      )
+      .flatOnce()
+
+    expect(diopter.set(data, (x) => x.map((y) => y * 10))).toEqual([
+      { a: [{ b: 10 }, { b: 20 }] },
+      { a: [{ c: 3 }, { b: 40 }] },
+      { a: [{ b: 50 }, { c: 6 }] },
+    ])
+  })
+
+  test('fails on data non-array', () => {
+    const data = 1 as any
+
+    const diopter = d<typeof data>().flatOnce()
+
+    expect(() => diopter.get(data)).toThrow('Not an array')
+    expect(() => diopter.set(data, () => [1, 2])).toThrow('Not an array')
+    expect(() => diopter.set(data, (x) => x.map((y) => y * 10))).toThrow(
+      'Not an array',
+    )
+  })
+
+  test('fails on data non-2d array', () => {
+    const data = [1, 2, 3] as any
+
+    const diopter = d<typeof data>().flatOnce()
+
+    expect(() => diopter.get(data)).toThrow('Not a 2d array')
+    expect(() => diopter.set(data, () => [1, 2])).toThrow('Not a 2d array')
+    expect(() => diopter.set(data, (x) => x.map((y) => y * 10))).toThrow(
+      'Not a 2d array',
+    )
+  })
+
+  test('fails on array length mismatch', () => {
+    const data = [
+      [1, 2],
+      [3, 4, 5],
+    ]
+
+    const diopter = d<typeof data>().flatOnce()
+
+    expect(() => diopter.set(data, () => [1, 2])).toThrow(
+      'Modified array length mismatch',
+    )
   })
 })

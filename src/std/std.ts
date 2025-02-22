@@ -46,7 +46,7 @@ export type Std<A, B, isAbPrism extends boolean> = {
   map<C>(
     mapFn: (
       valueOfA: Diopter<ValueOf<B>, ValueOf<B>>,
-    ) => Diopter<ValueOf<B>, C>,
+    ) => Diopter<ValueOf<B>, C, true> | Diopter<ValueOf<B>, C, false>,
   ): Diopter<A, NonNullable<C>[]>
 
   find<C extends B>(predicate: (b: B) => b is C): Diopter<A[], C[]>

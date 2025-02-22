@@ -6,7 +6,7 @@ export type Diopter<A, B, isPrism extends boolean = false> = {
   get(a: A): NoInfer<isPrism> extends true ? B | undefined : B
   set(a: A, modFn: (b: B) => B): A
   isPrism: isPrism
-  print: () => string
+  toString: () => string
 } & Std<A, B, isPrism> &
   Paths<A, B, isPrism>
 
@@ -25,7 +25,7 @@ export const diopter = <A, B, isPrism extends boolean = false>({
     get,
     set,
     isPrism: isPrism ?? false,
-    print: () => {
+    toString: () => {
       return debug ?? '<?>'
     },
   }

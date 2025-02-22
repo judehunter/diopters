@@ -30,6 +30,6 @@ export const composeDiopters = <
       return ab.set(a, () => bc.set(b as any, modFn) as B)
     }) as any,
     isPrism: ab.isPrism || bc.isPrism,
-    debug: `[${ab.print()}] + [${bc.print()}]`,
+    debug: `[${ab.toString()}] + [${bc.toString()}]`,
   }) as any
 }
