@@ -8,6 +8,7 @@ import { makeGuard } from './guard'
 import { makeMap } from './map'
 import { makeFlatOnce } from './flatOnce'
 import { makeOpt } from './opt'
+import { makePick } from './pick'
 
 export type Std<A, B, isAbPrism extends boolean> = {
   /**
@@ -49,8 +50,22 @@ export type Std<A, B, isAbPrism extends boolean> = {
     ) => Diopter<ValueOf<B>, C, true> | Diopter<ValueOf<B>, C, false>,
   ): Diopter<A, NonNullable<C>[]>
 
-  find<C extends B>(predicate: (b: B) => b is C): Diopter<A[], C[]>
+  /**
+   * `filter()` returns a sub-array of elements that match the predicate.
+   */
+  filter<C extends B>(predicate: (b: B) => b is C): Diopter<A[], C[]>
 
+  /**
+   * `pick()` focuses on a subset of keys from the object.
+   */
+  pick<PickedKeys extends keyof B>(
+    keys: PickedKeys[],
+  ): Diopter<A, Pick<B, PickedKeys>>
+
+  /**
+   * `flatOnce()` turns a 2d array into a 1d array.
+   * Apply multiple times to flatten more levels.
+   */
   flatOnce(): Diopter<A, B extends any[][] ? B[number] : never>
 }
 
@@ -69,6 +84,9 @@ export const std = <A, B, isAbPrism extends boolean>(
   const map: Std<A, B, isAbPrism>['map'] = (mapFn) =>
     compose(makeMap(mapFn) as any) as any
 
+  const pick: Std<A, B, isAbPrism>['pick'] = (keys) =>
+    compose(makePick(keys as any) as any) as any
+
   const flatOnce: Std<A, B, isAbPrism>['flatOnce'] = () =>
     compose(makeFlatOnce() as any) as any
 
@@ -78,6 +96,7 @@ export const std = <A, B, isAbPrism extends boolean>(
     opt,
     guard,
     map,
+    pick,
     flatOnce,
   }
 
