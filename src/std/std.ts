@@ -20,9 +20,9 @@ export type Std<A, B, isAbPrism extends boolean> = RemoveNevers<{
    * This is useful for chaining diopters together,
    * including your custom diopters.
    */
-  compose<C, isBcPrism extends boolean>(
+  compose: <C, isBcPrism extends boolean>(
     bc: Diopter<NoInfer<B>, C, isBcPrism>,
-  ): Diopter<
+  ) => Diopter<
     A,
     C,
     isAbPrism extends true ? true : isBcPrism extends true ? true : false
@@ -31,7 +31,7 @@ export type Std<A, B, isAbPrism extends boolean> = RemoveNevers<{
   /**
    * `opt()` is just a `guard()` with a predicate that excludes `undefined`
    */
-  opt(): Diopter<A, NonUndef<B>, true>
+  opt: [undefined] extends [B] ? () => Diopter<A, NonUndef<B>, true> : never
 
   /**
    * `guard()` takes a predicate and returns a new composed diopter that
@@ -60,11 +60,13 @@ export type Std<A, B, isAbPrism extends boolean> = RemoveNevers<{
   /**
    * `map()` applies a diopter given by `mapFn` to each element of the array.
    */
-  map<C>(
-    mapFn: (
-      valueOfA: Diopter<ArrayElem<B>, ArrayElem<B>>,
-    ) => Diopter<ArrayElem<B>, C, true> | Diopter<ArrayElem<B>, C, false>,
-  ): B extends any[] ? Diopter<A, NonNullable<C>[]> : never
+  map: [B] extends [any[]]
+    ? <C>(
+        mapFn: (
+          valueOfA: Diopter<ArrayElem<B>, ArrayElem<B>>,
+        ) => Diopter<ArrayElem<B>, C, true> | Diopter<ArrayElem<B>, C, false>,
+      ) => Diopter<A, NonNullable<C>[]>
+    : never
 
   /**
    * `filter()` returns a sub-array of elements that match the predicate.
@@ -75,25 +77,27 @@ export type Std<A, B, isAbPrism extends boolean> = RemoveNevers<{
   /**
    * `pick()` focuses on a subset of keys from the object.
    */
-  pick<PickedKeys extends keyof B>(
-    keys: PickedKeys[],
-  ): Diopter<A, Pick<B, PickedKeys>>
+  pick: [B] extends [Record<string, any>]
+    ? <PickedKeys extends keyof B>(
+        keys: PickedKeys[],
+      ) => Diopter<A, Pick<B, PickedKeys>>
+    : never
 
   /**
    * `flat()` turns a 2d array into a 1d array.
    * Apply multiple times to flatten more levels.
    */
-  flat(): B extends any[][] ? Diopter<A, B[number]> : never
+  flat: [B] extends [any[][]] ? () => Diopter<A, B[number]> : never
 }>
 
 export const std = <A, B, isAbPrism extends boolean>(
   ab: Diopter<A, B, isAbPrism>,
 ) => {
   const compose: Std<A, B, isAbPrism>['compose'] = (bc) =>
-    composeDiopters(ab, bc)
+    composeDiopters(ab as any, bc as any)
 
-  const opt: Std<A, B, isAbPrism>['opt'] = () =>
-    compose(makeOpt() as any) as any
+  const opt: Std<A, B, isAbPrism>['opt'] = (() =>
+    compose(makeOpt() as any) as any) as any
 
   const guard: Std<A, B, isAbPrism>['guard'] = (predicate) =>
     compose(makeGuard(predicate) as any) as any
@@ -104,14 +108,14 @@ export const std = <A, B, isAbPrism extends boolean>(
   const entries: Std<A, B, isAbPrism>['entries'] = (() =>
     compose(makeEntries() as any) as any) as any
 
-  const map: Std<A, B, isAbPrism>['map'] = (mapFn) =>
-    compose(makeMap(mapFn) as any) as any
+  const map: Std<A, B, isAbPrism>['map'] = ((mapFn) =>
+    compose(makeMap(mapFn) as any) as any) as any
 
-  const pick: Std<A, B, isAbPrism>['pick'] = (keys) =>
-    compose(makePick(keys as any) as any) as any
+  const pick: Std<A, B, isAbPrism>['pick'] = ((keys) =>
+    compose(makePick(keys as any) as any) as any) as any
 
-  const flat: Std<A, B, isAbPrism>['flat'] = () =>
-    compose(makeFlat() as any) as any
+  const flat: Std<A, B, isAbPrism>['flat'] = (() =>
+    compose(makeFlat() as any) as any) as any
 
   const target = {
     ...ab,
