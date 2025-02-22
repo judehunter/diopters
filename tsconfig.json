@@ -1,11 +1,11 @@
 {
   "compilerOptions": {
-    "target": "es2022",
-    "lib": ["es2022", "es5", "es6", "dom", "dom.iterable"],
+    "target": "ESNext",
+    "lib": ["ESNext", "es5", "es6", "dom", "dom.iterable"],
     "allowJs": true,
     "esModuleInterop": true,
-    "module": "CommonJS",
-    "moduleResolution": "node",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "downlevelIteration": true,
     "strict": true,
