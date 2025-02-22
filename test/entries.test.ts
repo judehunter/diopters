@@ -107,3 +107,29 @@ test('advanced use case > mod', () => {
     e: undefined,
   })
 })
+
+test('fails on non-object data > get', () => {
+  const data = 1
+
+  const diopter = d<any>().entries()
+
+  expect(() => diopter.get(data)).toThrow('Not an object')
+})
+
+test('fails on non-object data > set', () => {
+  const data = 1
+
+  const diopter = d<any>().entries()
+
+  expect(() => diopter.set(data, () => [[1, 10]])).toThrow('Not an object')
+})
+
+test('fails on non-object data > mod', () => {
+  const data = 1
+
+  const diopter = d<any>().entries()
+
+  expect(() => diopter.set(data, (x) => x.map((entry) => entry))).toThrow(
+    'Not an object',
+  )
+})
