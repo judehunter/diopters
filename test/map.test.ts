@@ -35,10 +35,23 @@ test('fails on data non-array > mod', () => {
   )
 })
 
-test('fails on modified non-array > set & mod', () => {
+test('fails on modified non-array > non-prism > set & mod', () => {
   const data = [1, 2, 3] as number[]
 
   const diopter = d<typeof data>().map((x) => x)
+
+  expect(() => diopter.set(data, () => 1 as any)).toThrow(
+    'Modified is not an array',
+  )
+  expect(() => diopter.set(data, (x) => x.length as any)).toThrow(
+    'Modified is not an array',
+  )
+})
+
+test('fails on modified non-array > prism > set & mod', () => {
+  const data = [1, 2, 3] as (number | undefined)[]
+
+  const diopter = d<typeof data>().map((x) => x.opt())
 
   expect(() => diopter.set(data, () => 1 as any)).toThrow(
     'Modified is not an array',
@@ -98,7 +111,7 @@ test('nested > get', () => {
   expect(diopter.get(data)).toEqual([[1], [2], [3]])
 })
 
-test('fails on modified array length mismatch > set', () => {
+test('fails on modified array length mismatch > non-prism >  set', () => {
   const data = [1, 2, 3]
 
   const diopter = d<typeof data>().map((x) => x)
@@ -107,10 +120,28 @@ test('fails on modified array length mismatch > set', () => {
   expect(() => diopter.set(data, () => [4, 5, 6, 7])).toThrow()
 })
 
-test('fails on array length mismatch (with undefs) > set', () => {
+test('fails on array length mismatch (with undefs) > non-prism > set', () => {
   const data = [1, undefined, 3, undefined] as (number | undefined)[]
 
   const diopter = d<typeof data>().map((x) => x)
+
+  expect(() => diopter.set(data, () => [4])).toThrow()
+  expect(() => diopter.set(data, () => [4, 5, 6])).toThrow()
+})
+
+test('fails on modified array length mismatch > prism > set', () => {
+  const data = [1, 2, 3]
+
+  const diopter = d<typeof data>().map((x) => (x as any).opt())
+
+  expect(() => diopter.set(data, () => [4, 5])).toThrow()
+  expect(() => diopter.set(data, () => [4, 5, 6, 7])).toThrow()
+})
+
+test('fails on array length mismatch (with undefs) > prism > set', () => {
+  const data = [1, undefined, 3, undefined] as (number | undefined)[]
+
+  const diopter = d<typeof data>().map((x) => x.opt())
 
   expect(() => diopter.set(data, () => [4])).toThrow()
   expect(() => diopter.set(data, () => [4, 5, 6])).toThrow()
