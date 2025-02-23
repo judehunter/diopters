@@ -176,26 +176,52 @@ test('nested > mod', () => {
   ])
 })
 
-test('undefined elements > get', () => {
+test('undefined elements > non-prism > get', () => {
   const data = [1, undefined, 3] as (number | undefined)[]
 
   const diopter = d<typeof data>().map((x) => x)
+
+  expect(diopter.get(data)).toEqual([1, undefined, 3])
+})
+
+test('undefined elements > non-prism > set', () => {
+  const data = [1, undefined, 3] as (number | undefined)[]
+
+  const diopter = d<typeof data>().map((x) => x)
+
+  expect(diopter.set(data, () => [4, 5, undefined])).toEqual([4, 5, undefined])
+})
+
+test('undefined elements > non-prism > mod', () => {
+  const data = [1, undefined, 3] as (number | undefined)[]
+
+  const diopter = d<typeof data>().map((x) => x)
+
+  expect(diopter.set(data, (x) => x.map((y) => (y ?? 10) * 10))).toEqual([
+    10, 100, 30,
+  ])
+})
+
+test('undefined elements > prism > get', () => {
+  const data = [1, undefined, 3] as (number | undefined)[]
+
+  const diopter = d<typeof data>().map((x) => x.opt())
 
   expect(diopter.get(data)).toEqual([1, 3])
 })
 
-test('undefined elements > set', () => {
+test('undefined elements > prism > set', () => {
   const data = [1, undefined, 3] as (number | undefined)[]
 
-  const diopter = d<typeof data>().map((x) => x)
+  const diopter = d<typeof data>().map((x) => x.opt())
 
-  expect(diopter.set(data, () => [4, 6])).toEqual([4, undefined, 6])
+  expect(diopter.set(data, () => [4, 5])).toEqual([4, undefined, 5])
 })
 
-test('undefined elements > mod', () => {
+test('undefined elements > prism > mod', () => {
   const data = [1, undefined, 3] as (number | undefined)[]
 
-  const diopter = d<typeof data>().map((x) => x)
+  const diopter = d<typeof data>().map((x) => x.opt())
 
   expect(diopter.set(data, (x) => x.map((y) => y * 10))).toEqual([
     10,
@@ -207,9 +233,7 @@ test('undefined elements > mod', () => {
 test('undefined elements > nested > get', () => {
   const data = [[1, 2], [3, undefined], undefined]
 
-  const diopter = d<typeof data>()
-    .map((x) => x)
-    .map((x) => x.map((y) => y))
+  const diopter = d<typeof data>().map((x) => x.opt().map((y) => y.opt()))
 
   expect(diopter.get(data)).toEqual([[1, 2], [3]])
 })
@@ -217,9 +241,7 @@ test('undefined elements > nested > get', () => {
 test('undefined elements > nested > set', () => {
   const data = [[1, 2], [3, undefined], undefined]
 
-  const diopter = d<typeof data>()
-    .map((x) => x)
-    .map((x) => x.map((y) => y))
+  const diopter = d<typeof data>().map((x) => x.opt().map((y) => y.opt()))
 
   expect(diopter.set(data, () => [[4, 5], [6]])).toEqual([
     [4, 5],
@@ -231,9 +253,7 @@ test('undefined elements > nested > set', () => {
 test('undefined elements > nested > set', () => {
   const data = [[1, 2], [3, undefined], undefined]
 
-  const diopter = d<typeof data>()
-    .map((x) => x)
-    .map((x) => x.map((y) => y))
+  const diopter = d<typeof data>().map((x) => x.opt().map((y) => y.opt()))
 
   expect(diopter.set(data, (x) => [[x[0][0] * 10, 5], [6]])).toEqual([
     [10, 5],

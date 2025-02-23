@@ -1,19 +1,20 @@
 import { d } from '../d'
-import { diopter } from '../diopter'
+import { Diopter, diopter } from '../diopter'
 
-export const makeMap = (mapFn: (a: any) => any) => {
+export const makeMap = (mapFn: (a: any) => Diopter<any, any, boolean>) => {
   const get = (a) => {
     if (!Array.isArray(a)) {
       throw new Error('Not an array')
     }
-    return a
-      .map((elem, i) => {
-        const elemLens = d<typeof elem>()
-        const transformedLens = mapFn(elemLens as any)
-        const transformed = transformedLens.get(elem)
-        return transformed
-      })
-      .filter((x): x is NonNullable<typeof x> => x !== undefined && x !== null)
+    const elemLens = d()
+    const mapLens = mapFn(elemLens as any)
+    return a.flatMap((elem) => {
+      const mapped = mapLens.get(elem)
+      if (mapLens.isPrism && mapped === undefined) {
+        return []
+      }
+      return [mapped]
+    })
   }
 
   return diopter({
@@ -24,22 +25,36 @@ export const makeMap = (mapFn: (a: any) => any) => {
       }
       const elemLens = d()
       const mapLens = mapFn(elemLens as any)
-      const valuesWithUndefs = a.map((elem, i) => mapLens.get(elem))
 
-      const definedIndices = valuesWithUndefs
-        .map((x, i) => (x !== undefined ? i : null))
-        .filter((x) => x !== null)
+      const values = a.map((elem, i) => mapLens.get(elem))
 
-      const values = valuesWithUndefs.filter(
+      if (!mapLens.isPrism) {
+        const modified = modFn(values)
+        if (!Array.isArray(modified)) {
+          throw new Error('Modified is not an array')
+        }
+        if (modified.length !== values.length) {
+          throw new Error('Array length mismatch')
+        }
+        return a.map((elem, i) => {
+          return mapLens.set(elem, () => modified[i])
+        })
+      }
+
+      const definedIndices = values.flatMap((x, i) =>
+        x === undefined ? [] : [i],
+      )
+
+      const definedValues = values.filter(
         (x): x is NonNullable<typeof x> => x !== undefined,
       )
 
-      const modified = modFn(values)
+      const modified = modFn(definedValues)
 
       if (!Array.isArray(modified)) {
         throw new Error('Modified is not an array')
       }
-      if (modified.length !== definedIndices.length) {
+      if (modified.length !== definedValues.length) {
         throw new Error('Array length mismatch')
       }
 

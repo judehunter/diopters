@@ -65,11 +65,14 @@ export type Std<A, B, isAbPrism extends boolean> = RemoveNevers<{
    * `map()` applies a diopter given by `mapFn` to each element of the array.
    */
   map: [B] extends [any[]]
-    ? <C>(
+    ? <C, isMapPrism extends boolean>(
         mapFn: (
           valueOfA: Diopter<ArrayElem<B>, ArrayElem<B>>,
-        ) => Diopter<ArrayElem<B>, C, true> | Diopter<ArrayElem<B>, C, false>,
-      ) => Diopter<A, NonNullable<C>[]>
+        ) =>
+          | Diopter<ArrayElem<B>, C, true & isMapPrism>
+          | Diopter<ArrayElem<B>, C, false & isMapPrism>,
+        // ^ some typescript oddity requires this weird hack
+      ) => Diopter<A, isMapPrism extends true ? NonNullable<C>[] : C[]>
     : never
 
   /**

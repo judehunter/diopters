@@ -52,11 +52,10 @@ In essence, a `Diopter` is a:
 
 - Lens – it specifies how to get from one data type to another.
 
-- Prism – it can optionally short-circuit if the data is not what you're looking for.
-Akin to the `?.` operator, but for arbitrary conditions.
+- Prism – it can optionally short-circuit if the data is not what you're looking for. Akin to the `?.` operator, but for arbitrary conditions.
 
-- Traversal – you can apply optics over collections.
-The result is just a Diopter that focuses on the mapped collection.
+- Traversal – you can apply optics over collections. The result is just a Diopter that focuses on the mapped collection.
+
 
 ## Creating custom Diopters
 
@@ -236,12 +235,30 @@ Applies a Diopter to each element of an array, and then focuses on the result.
 
 Note that when setting, this means you need to return a new modified array, typically by mapping over the given array. In other words, the setter function will only be called once with the focused array, not once per element.
 
-`undefined` elements are skipped from the focused array. This means that you can combine `map` with `guard` to create a `filter` Diopter.
+```ts
+type Data = { a: number }[]
+const foo = d<Data>()
+  .map(x => x.a)
+// ^? Diopter<From: Data, To: number[]>
+
+foo.get( ... )
+// ^? number[]
+foo.get([{ a: 1 }, { a: 2 }]) // [1, 2]
+
+foo.set( ... )
+// ^? Data
+foo.set(
+  [{ a: 1 }, { a: 2 }],
+  list => list.map(x => x * 10)
+) // [{ a: 10 }, { a: 20 }]
+```
+
+If the mapping function returns a Diopter in prism mode (e.g. when using `opt()` or `guard()`), then missing (`undefined`) elements are skipped from the focused array. This means that you can combine `map` with `guard` to achieve a `filter` Diopter.
 
 ```ts
 type Data = { a: number | undefined }[]
 const foo = d<Data>()
-  .map(x => x.a)
+  .map(x => x.a.opt())
 // ^? Diopter<From: Data, To: number[]>
 
 foo.get( ... )
@@ -252,7 +269,8 @@ foo.set( ... )
 // ^? Data
 foo.set(
   [{ a: 1 }, { a: undefined }, { a: 3 }],
-  list => list.map(x => x * 10) // the type of `list` is `number[]`, and NOT `(number | undefined)[]`
+  // the type of `list` is `number[]`, and NOT `(number | undefined)[]`
+  list => list.map(x => x * 10)
 ) // [{ a: 10 }, { a: undefined }, { a: 30 }]
 ```
 
