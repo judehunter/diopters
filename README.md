@@ -12,7 +12,7 @@ Dead-simple, TypeScript-first optics library. Optics are a way to drill into com
 
 🔋 **Batteries included**. Ships with common optics, like `path`, `map`, `guard`, and more.
 
-🔧 **Well tested**. 137 comprehensive tests, 100% coverage. Any issues will be swiftly addressed.
+🔧 **Well tested**. 140 comprehensive tests, 100% coverage. Any issues will be swiftly addressed.
 
 ```ts
 type User = { accounts?: Account[] }
@@ -54,8 +54,13 @@ In essence, a `Diopter` is a:
 
 - Prism – it can optionally short-circuit if the data is not what you're looking for. Akin to the `?.` operator, but for arbitrary conditions.
 
-- Traversal – you can apply optics over collections. The result is just a Diopter that focuses on the mapped collection.
+- Traversal – you can apply optics over collection elements with `.map()`. The result is just a Diopter that focuses on the mapped collection.
 
+A `Diopter` has the following signature:
+
+```ts
+type Diopter<From, To, IsPrism = false>
+```
 
 ## Creating custom Diopters
 
