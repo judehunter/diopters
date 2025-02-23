@@ -42,6 +42,10 @@ userToMoney.get({}) // undefined
 npm i diopters
 ```
 
+## Documentation
+
+All you need is to read the rest of this README.md 😄
+
 ## Anatomy of a Diopter
 
 In essence, a `Diopter` is a:
@@ -147,7 +151,7 @@ example.set([1, 'a', 2], () => 'b') // [1, 'b', 2]
 
 ### opt
 
-Stops drilling (short-circuits) into the data structure immediately if the current value is undefined or null.
+Stops drilling (short-circuits) into the data structure immediately if the current value is `undefined` or `null`.
 
 This is equivalent to the `?.` operator.
 
@@ -275,7 +279,7 @@ You might notice that modifying this nested focused array is a bit cumbersome, s
 
 ### flat
 
-Focuses on a an array that is created as a result of flattening a 2d array into a 1d array.
+Focuses on an array that is created as a result of flattening a 2d array into a 1d array.
 
 This is very useful when focusing on nested arrays, in scenarios where you only care about the final list of elements, and not the structure of the nested arrays.
 
@@ -296,7 +300,7 @@ example.set( ... )
 example.set([[1, 2], [3, 4]], list => list.map(x => x * 10)) // [[10, 20], [30, 40]]
 ```
 
-### Pick
+### pick
 
 Focuses on a subobject of an object, given by an array of keys. It's a useful way to avoid the spread syntax when setting.
 
