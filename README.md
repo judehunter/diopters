@@ -6,7 +6,7 @@ Dead-simple, TypeScript-first optics library. Optics are a way to drill into com
 
 🌊 **Fluent API**. Define optics just as you would access nested data. Get a setter for free.
 
-🤏 **Tiny**. <1kB minified and brotlied. No dependencies.
+🤏 **Tiny**. 1kB minified and brotlied. No dependencies.
 
 🧠 **TypeScript-first**. Fully type safe optic composition.
 
